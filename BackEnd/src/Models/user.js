@@ -21,13 +21,7 @@ const userSchema = new mongoose.Schema (
             enum: ['male', 'female', 'other'],
 
         },
-        seatPreference : {
-            type : String,
-            type: String,
-        enum: ['Lower', 'Middle', 'Upper', 'Side Lower', 'Side Upper', 'No Preference'],
-        default: 'No Preference'
-
-        },
+       
         password : {
             type : String,
             required : [ true, 'password is required'],

@@ -1,10 +1,11 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const connectDB = require("./config/db");
+const connectDB = require('./src/config/db');
 connectDB();
-const User = require("./models/user")
-const Passenger = require("./models/passenger");
+const User = require("./src/models/user");
+const Passenger = require("./src/models/passenger");
+const bcrypt = require('bcrypt');
 const app = express();
 
 app.use(express.json());
@@ -12,10 +13,12 @@ app.use(cors("*"));
 app.post("/signup", async (req, res) => {
     try {
         const { username, age, gender,password,email } = req.body;
+        console.log("password",password)
         if (!username || !age || !gender || !password || !email) {
            return res.status(400).json({ message: "All Fields are required" });
         }
-        const user = await User.create({ username, age, gender, email,password})
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const user = await User.create({ username, age, gender, email,password:hashedPassword })
         return res.status(201).json({
          message: 'Account created successfully',
          user: {
@@ -42,6 +45,7 @@ app.post("/signup", async (req, res) => {
 app.post("/login",async(req,res) => {
     try{
         const {username,password} = req.body;
+        console.log("username",username);
         if(!username || !password){
            return res.status(400).json({message:"username and password are required"});
 
@@ -50,7 +54,8 @@ app.post("/login",async(req,res) => {
         if(!user){
            return res.status(404).json({message:"Account not found"});
         }
-        if(user.password !== password){
+        const isMatch = await bcrypt.compare(password, user.password);
+        if(!isMatch){
            return res.status(401).json({message:"Invalid Login Credentials"});
         }
         return res.status(200).json({
