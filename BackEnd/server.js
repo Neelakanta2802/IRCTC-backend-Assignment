@@ -10,6 +10,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cors("*"));
+//signup 
 app.post("/signup", async (req, res) => {
     try {
         const { username, age, gender,password,email } = req.body;
